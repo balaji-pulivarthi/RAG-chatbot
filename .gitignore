@@ -1,0 +1,16 @@
+# Ignore Virtual Environment
+venv/
+.venv/
+
+# Ignore Environment Variables (Security!)
+.env
+
+# Ignore Database (Too large)
+chroma_db/
+
+# Ignore Python Cache
+__pycache__/
+*.pyc
+
+# Ignore OS files
+.DS_Store
