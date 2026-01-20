@@ -7,13 +7,13 @@
 ## 📌 Project Overview
 This project is an internal **Question-Answering Bot** designed for secure corporate environments. It uses **Retrieval-Augmented Generation (RAG)** to answer employee queries based on internal documents (PDFs, Markdown, CSVs). 
 
-Crucially, it implements **Role-Based Access Control (RBAC)** to ensure employees only access data permitted for their department (e.g., Finance users cannot see HR salary data).
+Crucially, it implements **Role-Based Access Control (RBAC)** to ensure employees only access data permitted for their department. For example, a Finance user can access financial reports, but cannot access HR salary data.
 
 ---
 
 ## 🚀 Key Features
 * **📚 RAG Pipeline:** Ingests and indexes internal documents for accurate, context-aware answers.
-* **🔐 Zero-Trust Security:** Every query is filtered based on the user's role.
+* **🔐 Zero-Trust Security:** Every query is filtered based on the user's role (Finance, HR, Engineering, Marketing).
 * **🧠 Hybrid Intelligence:** Uses internal docs for specific questions and switches to General AI for general knowledge.
 * **🔑 JWT Authentication:** Secure login system with hashed passwords and session management.
 * **⚡ Modern Stack:** Built with FastAPI (Backend), Streamlit (Frontend), and ChromaDB (Vector Store).
@@ -68,52 +68,3 @@ rag-chatbot/
 ├── chroma_db/           # Local Vector Database
 ├── requirements.txt     # Dependencies
 └── README.md            # Documentation
-
-
-
-🏃‍♂️ How to Run Locally
-1. Clone the Repository
-Bash
-
-git clone [https://github.com/YOUR_USERNAME/Corporate-RAG-Chatbot.git](https://github.com/YOUR_USERNAME/Corporate-RAG-Chatbot.git)
-cd Corporate-RAG-Chatbot
-2. Set Up Virtual Environment
-Bash
-
-# Create venv
-python -m venv venv
-
-# Activate (Windows)
-.\venv\Scripts\Activate
-
-# Activate (Mac/Linux)
-source venv/bin/activate
-3. Install Dependencies
-Bash
-
-pip install -r requirements.txt
-4. Configure Environment
-Create a .env file in the root directory:
-
-Code snippet
-
-GOOGLE_API_KEY="your_google_api_key"
-SECRET_KEY="your_secret_key"
-ALGORITHM="HS256"
-5. Ingest Data
-Process the documents and build the database:
-
-Bash
-
-python -m app.ingest
-6. Start the App
-Terminal 1 (Backend):
-
-Bash
-
-uvicorn app.main:app --reload
-Terminal 2 (Frontend):
-
-Bash
-
-streamlit run frontend/streamlit_app.py
