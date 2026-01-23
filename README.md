@@ -5,9 +5,9 @@
 ![Security](https://img.shields.io/badge/Security-RBAC%20%2B%20JWT-red)
 
 ## 📌 Project Overview
-This project is an internal **Question-Answering Bot** designed for secure corporate environments. It uses **Retrieval-Augmented Generation (RAG)** to answer employee queries based on internal documents (PDFs, Markdown, CSVs). 
+This project is an internal **Question-Answering Bot** designed for secure corporate environments. It uses **Retrieval-Augmented Generation (RAG)** to answer employee queries based on internal documents and enforces role-based access restrictions.
 
-Crucially, it implements **Role-Based Access Control (RBAC)** to ensure employees only access data permitted for their department. For example, a Finance user can access financial reports, but cannot access HR salary data.
+Crucially, it implements **Role-Based Access Control (RBAC)** to ensure employees only access data permitted for their department. For example, a Finance user can access financial reports, but cannot access HR documents.
 
 ---
 
@@ -68,3 +68,131 @@ rag-chatbot/
 ├── chroma_db/           # Local Vector Database
 ├── requirements.txt     # Dependencies
 └── README.md            # Documentation
+```
+
+---
+
+## 🏃‍♂️ Installation & Setup
+
+1. Clone the Repository
+```bash
+git clone https://github.com/balaji-pulivarthi/RAG-chatbot.git
+cd RAG-chatbot
+```
+
+2. Set Up Virtual Environment
+```bash
+# Create venv
+python -m venv venv
+
+# Activate (Windows)
+.\venv\Scripts\activate
+
+# Activate (Mac/Linux)
+source venv/bin/activate
+```
+
+3. Install Dependencies
+```bash
+pip install -r requirements.txt
+```
+
+4. Configure Environment Variables  
+Create a `.env` file in the root directory and add your API keys and secrets:
+```env
+GOOGLE_API_KEY="your_google_api_key_here"
+SECRET_KEY="your_secret_key_for_jwt_signing"
+ALGORITHM="HS256"
+```
+
+5. Ingest Data (Build the Brain)  
+Process the documents in the `resources/` folder and build the ChromaDB vector store:
+```bash
+python -m app.ingest
+```
+
+---
+
+## 💻 Usage Guide
+
+1. Start the Backend Server  
+In your first terminal (with the venv activated):
+```bash
+uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+```
+Server will be available at: http://127.0.0.1:8000
+
+2. Start the Frontend UI  
+In a second terminal (activate venv if needed):
+```bash
+streamlit run frontend/streamlit_app.py
+```
+
+3. Log in with Demo Credentials  
+The system includes pre-defined users for demonstration:
+
+| Username       | Role         | Access Scope                       |
+| -------------- | ------------ | ---------------------------------- |
+| finance_user   | Finance      | Finance/ + General/                |
+| hr_user        | HR           | HR/ + General/                     |
+| eng_user       | Engineering  | Engineering/ + General/            |
+| marketing_user | Marketing    | Marketing/ + General/              |
+
+(Note: Passwords are defined/hashed in `app/auth.py` for the demo users.)
+
+---
+
+## 🧠 Technical Implementation Details
+
+### 🔹 1. Security Architecture (RBAC)
+We implemented a Metadata Filtering strategy.
+
+When documents are ingested, they are tagged with metadata: `{'department': 'HR'}`.  
+When a user queries, the backend extracts their role from the JWT token.  
+A mandatory filter is applied to the ChromaDB query:
+
+```python
+filter = {
+    "$or": [
+        {"department": user_role},
+        {"department": "General"}
+    ]
+}
+```
+
+Result: It is mathematically impossible for the database to return a chunk from a restricted department.
+
+### 🔹 2. RAG Pipeline Optimization
+* Chunking: Documents are split into 500-character chunks with 50-character overlap to preserve context.
+* Embeddings: We use `all-MiniLM-L6-v2` which maps text to a 384-dimensional vector space.
+* Hybrid Search: The system first checks internal documents. If the similarity score is low (indicating the answer isn't in the docs), it instructs the LLM to use its general knowledge.
+
+---
+
+## 🔧 Troubleshooting
+
+1. 404 Not Found (Gemini Model)  
+Issue: The API cannot find the specific model version.  
+Fix: Open `app/main.py` and ensure `model="gemini-pro"` is used instead of `"gemini-1.5-flash"`.
+
+2. 429 Resource Exhausted  
+Issue: You hit the Google Free Tier rate limit.  
+Fix: Wait 60 seconds and try again, or upgrade quota / add retry/backoff logic.
+
+3. ModuleNotFoundError  
+Issue: Python cannot find installed libraries.  
+Fix: Ensure your virtual environment is active. You should see `(venv)` in your terminal prompt.
+
+---
+
+## 🔮 Future Roadmap
+- [ ] Voice Interaction: Add speech-to-text for hands-free querying.
+- [ ] Slack Integration: Deploy as a bot within enterprise chat tools.
+- [ ] Admin Dashboard: UI for uploading documents without using Python scripts.
+- [ ] Multi-Language Support: Allow querying in Hindi, Spanish, etc.
+
+---
+
+If you'd like, I can:
+- commit and push this updated README to your repository,
+- or open a PR with the change.
