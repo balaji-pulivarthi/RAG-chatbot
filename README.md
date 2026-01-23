@@ -192,4 +192,3 @@ Fix: Ensure your virtual environment is active. You should see `(venv)` in your 
 - [ ] Multi-Language Support: Allow querying in Hindi, Spanish, etc.
 
 ---
-
