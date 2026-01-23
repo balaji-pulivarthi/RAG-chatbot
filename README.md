@@ -193,6 +193,3 @@ Fix: Ensure your virtual environment is active. You should see `(venv)` in your 
 
 ---
 
-If you'd like, I can:
-- commit and push this updated README to your repository,
-- or open a PR with the change.
